@@ -2,7 +2,7 @@ const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'seu_secret_jwt';
+const JWT_SECRET = process.env.JWT_SECRET || 'segredo';
 
 exports.login = async (req, res) => {
     const { email, senha } = req.body;
@@ -22,14 +22,20 @@ exports.login = async (req, res) => {
         }
 
         const psicologo = result.rows[0];
-        const senhaValida = await bcrypt.compare(senha, psicologo.senha);
+
+        // ✅ CORRIGIDO: compara com senha_hash
+        const senhaValida = await bcrypt.compare(senha, psicologo.senha_hash);
 
         if (!senhaValida) {
             return res.status(401).json({ error: 'Email ou senha inválidos' });
         }
 
         const token = jwt.sign(
-            { id: psicologo.id, email: psicologo.email, role: psicologo.role },
+            { 
+                id: psicologo.id, 
+                email: psicologo.email, 
+                role: psicologo.role 
+            },
             JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -38,7 +44,7 @@ exports.login = async (req, res) => {
             token,
             psicologo: {
                 id: psicologo.id,
-                nome: psicologo.nome,
+                nome: psicologo.nome_completo,
                 email: psicologo.email,
                 role: psicologo.role
             }
@@ -50,16 +56,23 @@ exports.login = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-    const { nome, email, senha, role } = req.body;
+    const { nome, email, senha, role, crp, especialidade, telefone } = req.body;
 
     try {
         const senhaHash = await bcrypt.hash(senha, 10);
+        
         const result = await pool.query(
-            'INSERT INTO psicologos (nome, email, senha, role) VALUES ($1, $2, $3, $4) RETURNING *',
-            [nome, email, senhaHash, role || 'psicologo']
+            `INSERT INTO psicologos 
+            (email, senha_hash, nome_completo, role, crp, especialidade, telefone) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            RETURNING *`,
+            [email, senhaHash, nome, role || 'psicologo', crp, especialidade, telefone]
         );
 
-        res.status(201).json({ message: 'Usuário criado com sucesso' });
+        res.status(201).json({ 
+            message: 'Usuário criado com sucesso',
+            psicologo: result.rows[0]
+        });
     } catch (error) {
         console.error('Erro no registro:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
