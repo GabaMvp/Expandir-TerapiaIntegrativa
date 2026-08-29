@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://expandir-terapiaintegrativa-production.up.railway.app';
+// URL do backend no Railway
+const API_URL = 'https://expandir-terapiaintegrativa-production.up.railway.app';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -9,6 +10,7 @@ const api = axios.create({
     }
 });
 
+// Interceptor para adicionar o token automaticamente
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -17,9 +19,12 @@ api.interceptors.request.use(
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        return Promise.reject(error);
+    }
 );
 
+// Interceptor para tratar erros de autenticação
 api.interceptors.response.use(
     (response) => response,
     (error) => {

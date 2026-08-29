@@ -22,16 +22,31 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('📝 Formulário submetido');
+        console.log('📝 Email:', email);
+        console.log('📝 Senha:', senha);
+        
         setError('');
         setLoading(true);
 
-        const result = await login(email, senha);
-        if (result.success) {
-            navigate('/');
-        } else {
-            setError(result.error || 'Erro ao fazer login.');
+        try {
+            console.log('📞 Chamando login...');
+            const result = await login(email, senha);
+            console.log('📞 Resultado do login:', result);
+            
+            if (result.success) {
+                console.log('✅ Login bem-sucedido, navegando...');
+                navigate('/');
+            } else {
+                console.log('❌ Erro no login:', result.error);
+                setError(result.error || 'Erro ao fazer login.');
+            }
+        } catch (err) {
+            console.error('❌ Erro inesperado:', err);
+            setError('Erro inesperado ao fazer login.');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
