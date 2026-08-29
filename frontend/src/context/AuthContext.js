@@ -10,13 +10,18 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, senha) => {
         setLoading(true);
         try {
-            const response = await api.post('/auth/login', { email, senha });
+            const response = await api.post('/api/auth/login', { email, senha });
             const { token, psicologo } = response.data;
             localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(psicologo));
             setUser(psicologo);
             return { success: true };
         } catch (error) {
-            return { success: false, error: error.response?.data?.error || 'Erro ao fazer login' };
+            console.error('Erro no login:', error);
+            return {
+                success: false,
+                error: error.response?.data?.error || 'Erro ao fazer login'
+            };
         } finally {
             setLoading(false);
         }
@@ -24,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setUser(null);
     };
 
