@@ -11,18 +11,21 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Importar rotas
 const authRoutes = require('./src/routes/authRoutes');
 const pacienteRoutes = require('./src/routes/pacienteRoutes');
 const agendamentoRoutes = require('./src/routes/agendamentoRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const prontuarioRoutes = require('./src/routes/prontuarioRoutes');
 
+// Usar rotas com /api
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacienteRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/prontuarios', prontuarioRoutes);
 
+// Rota raiz
 app.get('/', (req, res) => {
     res.json({
         message: 'API Expandir Terapias Integrativa',
@@ -36,9 +39,14 @@ app.get('/', (req, res) => {
     });
 });
 
-
+// Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
 });
 
 const PORT = process.env.PORT || 8080;
