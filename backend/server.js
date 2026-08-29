@@ -3,9 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-
+// Middlewares
 app.use(cors({
-    origin: ['https://expandir-terapia-integrativa.vercel.app', 'http://localhost:3000'],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -36,6 +36,7 @@ app.get('/', (req, res) => {
     });
 });
 
+
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -43,11 +44,8 @@ app.get('/health', (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor na porta ${PORT}`);
-    console.log(`📡 Rotas disponíveis:`);
-    console.log(`   - GET  /`);
-    console.log(`   - POST /api/auth/login`);
-    console.log(`   - POST /api/auth/register`);
-    console.log(`   - GET  /api/pacientes`);
-    console.log(`   - GET  /api/agendamentos`);
-    console.log(`   - GET  /health`);
+    console.log(`📡 POST /api/auth/login`);
+    console.log(`📡 POST /api/auth/register`);
+    console.log(`📡 GET /api/pacientes`);
+    console.log(`📡 GET /api/agendamentos`);
 });
