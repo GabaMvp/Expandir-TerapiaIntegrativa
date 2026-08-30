@@ -104,6 +104,7 @@ export default function Login() {
                             size="large"
                             disabled={loading}
                             sx={{ mt: 3, bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#2a2a4e' } }}
+                            onClick={() => console.log('🖱️ Botão ENTRAR foi clicado!')}
                         >
                             {loading ? 'Carregando...' : 'Entrar'}
                         </Button>
