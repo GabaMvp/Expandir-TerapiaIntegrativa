@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Container,
@@ -18,14 +17,13 @@ export default function Login() {
     const [senha, setSenha] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resposta, setResposta] = useState(null);
 
-    const navigate = useNavigate();
     const { login } = useAuth();
 
     console.log('🔑 login function disponível:', !!login);
 
     const handleSubmit = async (e) => {
-        // 🔥 IMPEDE O RECARREGAMENTO DA PÁGINA
         e.preventDefault();
         e.stopPropagation();
         
@@ -35,26 +33,27 @@ export default function Login() {
         
         setError('');
         setLoading(true);
+        setResposta(null);
 
         try {
             console.log('📞 Chamando login...');
             const result = await login(email, senha);
             console.log('📞 Resultado do login:', JSON.stringify(result));
             
+            // Salva a resposta para mostrar na tela
+            setResposta(result);
+            
             if (result.success) {
-                console.log('✅ Login bem-sucedido, navegando...');
-                // Salva no localStorage para debug
-                localStorage.setItem('login_success', 'true');
-                navigate('/');
+                console.log('✅ Login bem-sucedido!');
+                setError('✅ Login bem-sucedido! (mas não vou redirecionar para você ver)');
             } else {
                 console.log('❌ Erro no login:', result.error);
-                setError(result.error || 'Erro ao fazer login.');
-                // Mantém a página parada para ver o erro
-                setLoading(false);
+                setError('❌ ' + (result.error || 'Erro ao fazer login.'));
             }
         } catch (err) {
             console.error('❌ Erro inesperado:', err);
-            setError('Erro inesperado ao fazer login.');
+            setError('❌ Erro inesperado: ' + err.message);
+        } finally {
             setLoading(false);
         }
     };
@@ -77,8 +76,17 @@ export default function Login() {
                     </Typography>
 
                     {error && (
-                        <Alert severity="error" sx={{ mb: 2 }}>
+                        <Alert severity={error.includes('✅') ? 'success' : 'error'} sx={{ mb: 2 }}>
                             {error}
+                        </Alert>
+                    )}
+
+                    {resposta && (
+                        <Alert severity="info" sx={{ mb: 2, fontSize: '12px', overflow: 'auto' }}>
+                            <strong>Resposta do servidor:</strong>
+                            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                                {JSON.stringify(resposta, null, 2)}
+                            </pre>
                         </Alert>
                     )}
 
