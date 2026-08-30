@@ -6,3 +6,8 @@
 [build.environment]
   NODE_VERSION = "18"
   REACT_APP_API_URL = "https://expandir-terapiaintegrativa-production.up.railway.app"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
