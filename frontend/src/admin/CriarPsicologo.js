@@ -15,19 +15,23 @@ import api from '../services/api';
 
 export default function CriarPsicologo() {
     const [formData, setFormData] = useState({
-        nome_completo: '',
+        nome: '',
         email: '',
         senha: '',
         crp: '',
         especialidade: '',
         telefone: '',
     });
+
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -38,9 +42,11 @@ export default function CriarPsicologo() {
 
         try {
             await api.post('/auth/register', formData);
+
             setSuccess(true);
+
             setFormData({
-                nome_completo: '',
+                nome: '',
                 email: '',
                 senha: '',
                 crp: '',
@@ -48,7 +54,9 @@ export default function CriarPsicologo() {
                 telefone: '',
             });
         } catch (err) {
-            setError(err.response?.data?.error || 'Erro ao criar psicólogo.');
+            setError(
+                err.response?.data?.error || 'Erro ao criar psicólogo.'
+            );
         } finally {
             setLoading(false);
         }
@@ -60,18 +68,28 @@ export default function CriarPsicologo() {
                 <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                     👨‍⚕️ Criar Psicólogo
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+
+                <Typography
+                    variant="body2"
+                    sx={{ color: 'text.secondary' }}
+                >
                     Cadastre um novo psicólogo na plataforma.
                 </Typography>
             </Box>
 
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <Card
+                sx={{
+                    borderRadius: 3,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                }}
+            >
                 <CardContent>
                     {success && (
                         <Alert severity="success" sx={{ mb: 2 }}>
                             Psicólogo cadastrado com sucesso!
                         </Alert>
                     )}
+
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>
                             {error}
@@ -80,16 +98,18 @@ export default function CriarPsicologo() {
 
                     <form onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
                                     label="Nome completo"
-                                    name="nome_completo"
-                                    value={formData.nome_completo}
+                                    name="nome"
+                                    value={formData.nome}
                                     onChange={handleChange}
                                     required
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -101,6 +121,7 @@ export default function CriarPsicologo() {
                                     required
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -113,6 +134,7 @@ export default function CriarPsicologo() {
                                     helperText="O psicólogo poderá alterar depois"
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -124,6 +146,7 @@ export default function CriarPsicologo() {
                                     placeholder="Ex: 12/34567"
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -133,6 +156,7 @@ export default function CriarPsicologo() {
                                     onChange={handleChange}
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -142,17 +166,26 @@ export default function CriarPsicologo() {
                                     onChange={handleChange}
                                 />
                             </Grid>
+
                             <Grid item xs={12}>
                                 <Button
                                     type="submit"
                                     variant="contained"
                                     startIcon={<PersonAdd />}
                                     disabled={loading}
-                                    sx={{ bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#2a2a4e' } }}
+                                    sx={{
+                                        bgcolor: '#1a1a2e',
+                                        '&:hover': {
+                                            bgcolor: '#2a2a4e'
+                                        }
+                                    }}
                                 >
-                                    {loading ? 'Cadastrando...' : 'Cadastrar Psicólogo'}
+                                    {loading
+                                        ? 'Cadastrando...'
+                                        : 'Cadastrar Psicólogo'}
                                 </Button>
                             </Grid>
+
                         </Grid>
                     </form>
                 </CardContent>
