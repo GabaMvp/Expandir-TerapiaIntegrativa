@@ -25,7 +25,10 @@ export default function Login() {
     console.log('🔑 login function disponível:', !!login);
 
     const handleSubmit = async (e) => {
+        // 🔥 IMPEDE O RECARREGAMENTO DA PÁGINA
         e.preventDefault();
+        e.stopPropagation();
+        
         console.log('🚀 handleSubmit FOI CHAMADO!');
         console.log('📝 Email:', email);
         console.log('📝 Senha:', senha);
@@ -36,19 +39,22 @@ export default function Login() {
         try {
             console.log('📞 Chamando login...');
             const result = await login(email, senha);
-            console.log('📞 Resultado do login:', result);
+            console.log('📞 Resultado do login:', JSON.stringify(result));
             
             if (result.success) {
                 console.log('✅ Login bem-sucedido, navegando...');
+                // Salva no localStorage para debug
+                localStorage.setItem('login_success', 'true');
                 navigate('/');
             } else {
                 console.log('❌ Erro no login:', result.error);
                 setError(result.error || 'Erro ao fazer login.');
+                // Mantém a página parada para ver o erro
+                setLoading(false);
             }
         } catch (err) {
             console.error('❌ Erro inesperado:', err);
             setError('Erro inesperado ao fazer login.');
-        } finally {
             setLoading(false);
         }
     };
@@ -104,7 +110,6 @@ export default function Login() {
                             size="large"
                             disabled={loading}
                             sx={{ mt: 3, bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#2a2a4e' } }}
-                            onClick={() => console.log('🖱️ Botão ENTRAR foi clicado!')}
                         >
                             {loading ? 'Carregando...' : 'Entrar'}
                         </Button>
