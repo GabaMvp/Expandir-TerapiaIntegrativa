@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// URL do backend no Railway
+// 🔴 URL FORÇADA DIRETAMENTE NO CÓDIGO
 const API_URL = 'https://expandir-terapiaintegrativa-production.up.railway.app';
+
+console.log('🔧 API_URL sendo usada:', API_URL);
 
 const api = axios.create({
     baseURL: API_URL,
@@ -13,6 +15,7 @@ const api = axios.create({
 // Interceptor para adicionar o token automaticamente
 api.interceptors.request.use(
     (config) => {
+        console.log('📤 Fazendo requisição para:', config.url);
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -26,8 +29,12 @@ api.interceptors.request.use(
 
 // Interceptor para tratar erros de autenticação
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        console.log('📥 Resposta recebida:', response.status);
+        return response;
+    },
     (error) => {
+        console.error('❌ Erro na resposta:', error.response?.status);
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
