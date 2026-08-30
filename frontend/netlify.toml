@@ -1,0 +1,6 @@
+[build]
+  base = "frontend"
+  publish = "build"
+
+[build.environment]
+  REACT_APP_API_URL = "https://expandir-terapiaintegrativa-production.up.railway.app"
