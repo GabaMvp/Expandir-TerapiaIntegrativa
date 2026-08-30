@@ -122,7 +122,7 @@ export default function Layout({ children }) {
         <Box
             sx={{
                 height: '100%',
-                bgcolor: '#1a1a2e',
+                bgcolor: '#7B944A',
                 position: 'relative',
             }}
         >
@@ -254,7 +254,7 @@ export default function Layout({ children }) {
                 >
                     <Avatar
                         sx={{
-                            bgcolor: '#4a9eff',
+                            bgcolor: '#687F3E',
                             fontWeight: 'bold',
                         }}
                     >
@@ -349,9 +349,7 @@ export default function Layout({ children }) {
                             fontWeight: 500,
                         }}
                     >
-                        {isAdmin
-                            ? `Olá, ${nomeCompleto}`
-                            : `Olá, ${nomeCompleto}`}
+                        {`Olá, ${nomeCompleto}`}
                     </Typography>
 
                     <IconButton onClick={handleMenuOpen}>
@@ -359,7 +357,7 @@ export default function Layout({ children }) {
                             sx={{
                                 width: 34,
                                 height: 34,
-                                bgcolor: '#4a9eff',
+                                bgcolor: '#687F3E',
                                 fontWeight: 'bold',
                             }}
                         >
