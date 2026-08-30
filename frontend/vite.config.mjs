@@ -22,6 +22,7 @@ export default defineConfig({
   preview: {
     allowedHosts: [
       'expandir-frontend-production.up.railway.app',
+      'expandir-terapiaintegrativa.up.railway.app',
     ],
   },
 });
