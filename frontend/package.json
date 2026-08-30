@@ -15,8 +15,12 @@
     "react-dom": "18.3.1",
     "react-is": "18.3.1",
     "react-router-dom": "7.18.3",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "recharts": "2.15.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^8.2.2"
   },
   "overrides": {
     "@mui/base": "5.0.0-beta.40",
@@ -28,11 +32,11 @@
     "@mui/utils": "5.15.20"
   },
   "scripts": {
-  "start": "vite",
-  "dev": "vite",
-  "build": "vite build",
-  "preview": "vite preview"
-},
+    "start": "vite preview --host 0.0.0.0 --port 8080",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -54,9 +58,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.1",
-    "vite": "^8.2.2"
   }
 }
