@@ -9,7 +9,7 @@ import {
     Alert,
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
-
+import { useNavigate } from 'react-router-dom';
 export default function Login() {
     console.log('🟢 Login component renderizou');
 
@@ -20,6 +20,7 @@ export default function Login() {
     const [resposta, setResposta] = useState(null);
 
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     console.log('🔑 login function disponível:', !!login);
 
@@ -45,7 +46,7 @@ export default function Login() {
             
             if (result.success) {
                 console.log('✅ Login bem-sucedido!');
-                setError('✅ Login bem-sucedido! (mas não vou redirecionar para você ver)');
+                navigate('/admin');
             } else {
                 console.log('❌ Erro no login:', result.error);
                 setError('❌ ' + (result.error || 'Erro ao fazer login.'));
