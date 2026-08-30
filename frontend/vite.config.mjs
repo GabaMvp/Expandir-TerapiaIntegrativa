@@ -18,4 +18,10 @@ export default defineConfig({
   build: {
     outDir: 'build',
   },
+
+  preview: {
+    allowedHosts: [
+      'expandir-frontend-production.up.railway.app',
+    ],
+  },
 });
