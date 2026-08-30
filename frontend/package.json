@@ -3,25 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^5.15.20",
-    "@mui/material": "^5.15.20",
-    "axios": "^1.20.0",
-    "react": "^18.2.0",
-    "react-calendar": "^3.9.0",
-    "react-dom": "^18.2.0",
-    "react-is": "^18.3.1",
-    "react-router-dom": "^7.18.2",
-    "react-scripts": "5.0.1",
-    "recharts": "^2.15.4"
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "5.15.20",
+    "@mui/material": "5.15.20",
+    "@mui/system": "5.15.20",
+    "@mui/utils": "5.15.20",
+    "axios": "1.20.0",
+    "react": "18.3.1",
+    "react-calendar": "3.9.0",
+    "react-dom": "18.3.1",
+    "react-is": "18.3.1",
+    "react-router-dom": "7.18.3",
+    "react-scripts": "^5.0.1",
+    "recharts": "2.15.4"
+  },
+  "overrides": {
+    "@mui/base": "5.0.0-beta.40",
+    "@mui/icons-material": "5.15.20",
+    "@mui/material": "5.15.20",
+    "@mui/private-theming": "5.15.20",
+    "@mui/styled-engine": "5.16.14",
+    "@mui/system": "5.15.20",
+    "@mui/utils": "5.15.20"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "start": "vite",
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+},
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -43,5 +54,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.2.2"
   }
 }
