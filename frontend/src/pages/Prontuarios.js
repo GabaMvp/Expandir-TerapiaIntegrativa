@@ -237,14 +237,14 @@ export default function Prontuarios() {
                     <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
                         <Tab label="📋 Avaliação" />
                         <Tab label="📝 Evoluções" />
-                        <Tab label="🔚 Encerramento" />
+                        <Tab label="Encerramento" />
                     </Tabs>
 
                     {tab === 0 && (
                         <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                             <CardContent>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                    🎯 Avaliação da Demanda
+                                    Avaliação da Demanda
                                 </Typography>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12}>
@@ -270,7 +270,7 @@ export default function Prontuarios() {
                                     <Grid item xs={12}>
                                         <Divider sx={{ my: 2 }} />
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            📋 Histórico do Paciente
+                                             Histórico do Paciente
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -332,7 +332,7 @@ export default function Prontuarios() {
                                     <Grid item xs={12}>
                                         <Divider sx={{ my: 2 }} />
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            🧠 Diagnóstico e Conduta
+                                             Diagnóstico e Conduta
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -491,7 +491,7 @@ export default function Prontuarios() {
                         <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                             <CardContent>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                    🔚 Encaminhamento / Encerramento
+                                     Encaminhamento / Encerramento
                                 </Typography>
                                 <Grid container spacing={2}>
                                     {formData.data_encerramento ? (

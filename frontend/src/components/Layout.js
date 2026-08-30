@@ -33,12 +33,33 @@ const drawerWidth = 260;
 export default function Layout({ children }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+
     const navigate = useNavigate();
     const { user, logout, isAdmin } = useAuth();
 
-    const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-    const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
-    const handleMenuClose = () => setAnchorEl(null);
+    const nomeCompleto = user?.nome || 'Psicólogo';
+
+    const primeiroNome =
+        nomeCompleto !== 'Psicólogo'
+            ? nomeCompleto.trim().split(' ')[0]
+            : 'Psicólogo';
+
+    const inicial =
+        nomeCompleto !== 'Psicólogo'
+            ? nomeCompleto.trim().charAt(0).toUpperCase()
+            : 'P';
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
 
     const handleLogout = () => {
         logout();
@@ -47,32 +68,91 @@ export default function Layout({ children }) {
     };
 
     const menuItems = [
-        { text: 'Dashboard', icon: <Dashboard />, path: '/' },
-        { text: 'Pacientes', icon: <People />, path: '/pacientes' },
-        { text: 'Agenda', icon: <CalendarToday />, path: '/agenda' },
-        { text: 'Prontuários', icon: <MedicalServices />, path: '/prontuarios' },
+        {
+            text: 'Dashboard',
+            icon: <Dashboard />,
+            path: '/',
+        },
+        {
+            text: 'Pacientes',
+            icon: <People />,
+            path: '/pacientes',
+        },
+        {
+            text: 'Agenda',
+            icon: <CalendarToday />,
+            path: '/agenda',
+        },
+        {
+            text: 'Prontuários',
+            icon: <MedicalServices />,
+            path: '/prontuarios',
+        },
     ];
 
     const adminMenuItems = [
-        { text: 'Dashboard Admin', icon: <AdminPanelSettings />, path: '/admin' },
-        { text: 'Criar Psicólogo', icon: <PersonAdd />, path: '/admin/psicologos/novo' },
-        { text: 'Criar Atendimento', icon: <CalendarToday />, path: '/admin/atendimentos/novo' },
-        { text: 'Todos os Pacientes', icon: <People />, path: '/admin/pacientes' },
-        { text: 'Todos os Agendamentos', icon: <CalendarToday />, path: '/admin/agendamentos' },
+        {
+            text: 'Dashboard Admin',
+            icon: <AdminPanelSettings />,
+            path: '/admin',
+        },
+        {
+            text: 'Criar Psicólogo',
+            icon: <PersonAdd />,
+            path: '/admin/psicologos/novo',
+        },
+        {
+            text: 'Criar Atendimento',
+            icon: <CalendarToday />,
+            path: '/admin/atendimentos/novo',
+        },
+        {
+            text: 'Todos os Pacientes',
+            icon: <People />,
+            path: '/admin/pacientes',
+        },
+        {
+            text: 'Todos os Agendamentos',
+            icon: <CalendarToday />,
+            path: '/admin/agendamentos',
+        },
     ];
 
     const drawer = (
-        <Box sx={{ height: '100%', bgcolor: '#1a1a2e' }}>
+        <Box
+            sx={{
+                height: '100%',
+                bgcolor: '#1a1a2e',
+                position: 'relative',
+            }}
+        >
             <Box sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold' }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: '#fff',
+                        fontWeight: 'bold',
+                    }}
+                >
                     Expandir
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: 'rgba(255,255,255,0.6)',
+                    }}
+                >
                     Terapia Integrativa
                 </Typography>
             </Box>
-            
-            <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+
+            <Divider
+                sx={{
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                }}
+            />
+
             <List>
                 {menuItems.map((item) => (
                     <ListItem
@@ -81,12 +161,23 @@ export default function Layout({ children }) {
                         onClick={() => navigate(item.path)}
                         sx={{
                             color: '#fff',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
                             mx: 1,
                             borderRadius: 2,
+                            width: 'calc(100% - 16px)',
+                            '&:hover': {
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                            },
                         }}
                     >
-                        <ListItemIcon sx={{ color: '#fff' }}>{item.icon}</ListItemIcon>
+                        <ListItemIcon
+                            sx={{
+                                color: '#fff',
+                                minWidth: 42,
+                            }}
+                        >
+                            {item.icon}
+                        </ListItemIcon>
+
                         <ListItemText primary={item.text} />
                     </ListItem>
                 ))}
@@ -94,7 +185,12 @@ export default function Layout({ children }) {
 
             {isAdmin && (
                 <>
-                    <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+                    <Divider
+                        sx={{
+                            bgcolor: 'rgba(255,255,255,0.1)',
+                        }}
+                    />
+
                     <List>
                         {adminMenuItems.map((item) => (
                             <ListItem
@@ -103,12 +199,23 @@ export default function Layout({ children }) {
                                 onClick={() => navigate(item.path)}
                                 sx={{
                                     color: '#fff',
-                                    '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
                                     mx: 1,
                                     borderRadius: 2,
+                                    width: 'calc(100% - 16px)',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255,255,255,0.1)',
+                                    },
                                 }}
                             >
-                                <ListItemIcon sx={{ color: '#fff' }}>{item.icon}</ListItemIcon>
+                                <ListItemIcon
+                                    sx={{
+                                        color: '#fff',
+                                        minWidth: 42,
+                                    }}
+                                >
+                                    {item.icon}
+                                </ListItemIcon>
+
                                 <ListItemText primary={item.text} />
                             </ListItem>
                         ))}
@@ -116,25 +223,88 @@ export default function Layout({ children }) {
                 </>
             )}
 
-            <Box sx={{ position: 'absolute', bottom: 0, width: '100%', p: 2 }}>
-                <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, cursor: 'pointer' }} onClick={handleMenuOpen}>
-                    <Avatar sx={{ bgcolor: '#4a9eff' }}>
-                        {user?.nome_completo?.charAt(0) || 'U'}
+            <Box
+                sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    width: '100%',
+                    p: 2,
+                    boxSizing: 'border-box',
+                }}
+            >
+                <Divider
+                    sx={{
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                    }}
+                />
+
+                <Box
+                    onClick={handleMenuOpen}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        mt: 2,
+                        p: 1,
+                        borderRadius: 2,
+                        cursor: 'pointer',
+                        '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.08)',
+                        },
+                    }}
+                >
+                    <Avatar
+                        sx={{
+                            bgcolor: '#4a9eff',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {inicial}
                     </Avatar>
-                    <Box sx={{ ml: 2, flex: 1 }}>
-                        <Typography variant="body2" sx={{ color: '#fff' }}>
-                            {user?.nome_completo || 'Usuário'}
+
+                    <Box
+                        sx={{
+                            ml: 2,
+                            flex: 1,
+                            minWidth: 0,
+                        }}
+                    >
+                        <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{
+                                color: '#fff',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {primeiroNome}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                            {user?.role === 'admin' ? 'Administrador' : user?.crp || 'Psicólogo'}
+
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: 'rgba(255,255,255,0.5)',
+                            }}
+                        >
+                            {user?.role === 'admin'
+                                ? 'Administrador'
+                                : 'Psicólogo'}
                         </Typography>
                     </Box>
                 </Box>
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                >
                     <MenuItem onClick={handleLogout}>
-                        <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
-                        <ListItemText>Sair</ListItemText>
+                        <ListItemIcon>
+                            <Logout fontSize="small" />
+                        </ListItemIcon>
+
+                        <ListItemText>
+                            Sair
+                        </ListItemText>
                     </MenuItem>
                 </Menu>
             </Box>
@@ -146,8 +316,12 @@ export default function Layout({ children }) {
             <AppBar
                 position="fixed"
                 sx={{
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    ml: { sm: `${drawerWidth}px` },
+                    width: {
+                        sm: `calc(100% - ${drawerWidth}px)`,
+                    },
+                    ml: {
+                        sm: `${drawerWidth}px`,
+                    },
                     bgcolor: '#fff',
                     color: '#1a1a2e',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
@@ -158,53 +332,101 @@ export default function Layout({ children }) {
                         color="inherit"
                         edge="start"
                         onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { sm: 'none' } }}
+                        sx={{
+                            mr: 2,
+                            display: {
+                                sm: 'none',
+                            },
+                        }}
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 500 }}>
-                        {isAdmin ? 'Admin' : `Olá, ${user?.nome_completo || 'Psicólogo'}`}
+
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            flexGrow: 1,
+                            fontWeight: 500,
+                        }}
+                    >
+                        {isAdmin
+                            ? `Olá, ${nomeCompleto}`
+                            : `Olá, ${nomeCompleto}`}
                     </Typography>
+
                     <IconButton onClick={handleMenuOpen}>
-                        <Avatar sx={{ width: 32, height: 32, bgcolor: '#4a9eff' }}>
-                            {user?.nome_completo?.charAt(0) || 'U'}
+                        <Avatar
+                            sx={{
+                                width: 34,
+                                height: 34,
+                                bgcolor: '#4a9eff',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {inicial}
                         </Avatar>
                     </IconButton>
                 </Toolbar>
             </AppBar>
+
             <Box
                 component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+                sx={{
+                    width: {
+                        sm: drawerWidth,
+                    },
+                    flexShrink: {
+                        sm: 0,
+                    },
+                }}
             >
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
-                    ModalProps={{ keepMounted: true }}
+                    ModalProps={{
+                        keepMounted: true,
+                    }}
                     sx={{
-                        display: { xs: 'block', sm: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        display: {
+                            xs: 'block',
+                            sm: 'none',
+                        },
+                        '& .MuiDrawer-paper': {
+                            boxSizing: 'border-box',
+                            width: drawerWidth,
+                        },
                     }}
                 >
                     {drawer}
                 </Drawer>
+
                 <Drawer
                     variant="permanent"
                     sx={{
-                        display: { xs: 'none', sm: 'block' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        display: {
+                            xs: 'none',
+                            sm: 'block',
+                        },
+                        '& .MuiDrawer-paper': {
+                            boxSizing: 'border-box',
+                            width: drawerWidth,
+                        },
                     }}
                     open
                 >
                     {drawer}
                 </Drawer>
             </Box>
+
             <Box
                 component="main"
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
+                    width: {
+                        sm: `calc(100% - ${drawerWidth}px)`,
+                    },
                     mt: 8,
                     bgcolor: '#f5f7fb',
                     minHeight: '100vh',
