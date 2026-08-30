@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// 🔴 URL FORÇADA DIRETAMENTE NO CÓDIGO
-const API_URL = 'https://expandir-terapiaintegrativa-production.up.railway.app';
+
+const API_URL = 'https://expandir-terapiaintegrativa-production.up.railway.app/api';
 
 console.log('🔧 API_URL sendo usada:', API_URL);
 
@@ -12,7 +12,6 @@ const api = axios.create({
     }
 });
 
-// Interceptor para adicionar o token automaticamente
 api.interceptors.request.use(
     (config) => {
         console.log('📤 Fazendo requisição para:', config.url);
@@ -27,7 +26,6 @@ api.interceptors.request.use(
     }
 );
 
-// Interceptor para tratar erros de autenticação
 api.interceptors.response.use(
     (response) => {
         console.log('📥 Resposta recebida:', response.status);
