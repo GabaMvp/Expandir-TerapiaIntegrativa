@@ -12,6 +12,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
+    console.log('🟢 Login component renderizou');
+
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [error, setError] = useState('');
@@ -20,9 +22,11 @@ export default function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    console.log('🔑 login function disponível:', !!login);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('📝 Formulário submetido');
+        console.log('🚀 handleSubmit FOI CHAMADO!');
         console.log('📝 Email:', email);
         console.log('📝 Senha:', senha);
         
