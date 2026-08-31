@@ -67,6 +67,7 @@ export default function Layout({ children }) {
         handleMenuClose();
     };
 
+    // Menu exclusivo do psicólogo
     const menuItems = [
         {
             text: 'Dashboard',
@@ -90,6 +91,7 @@ export default function Layout({ children }) {
         },
     ];
 
+    // Menu exclusivo do administrador
     const adminMenuItems = [
         {
             text: 'Dashboard Admin',
@@ -100,6 +102,11 @@ export default function Layout({ children }) {
             text: 'Criar Psicólogo',
             icon: <PersonAdd />,
             path: '/admin/psicologos/novo',
+        },
+        {
+            text: 'Criar Paciente',
+            icon: <PersonAdd />,
+            path: '/admin/pacientes/novo',
         },
         {
             text: 'Criar Atendimento',
@@ -117,6 +124,10 @@ export default function Layout({ children }) {
             path: '/admin/agendamentos',
         },
     ];
+
+    // Admin vê somente menu administrativo.
+    // Psicólogo vê somente o menu profissional.
+    const itensDoMenu = isAdmin ? adminMenuItems : menuItems;
 
     const drawer = (
         <Box
@@ -154,7 +165,7 @@ export default function Layout({ children }) {
             />
 
             <List>
-                {menuItems.map((item) => (
+                {itensDoMenu.map((item) => (
                     <ListItem
                         button
                         key={item.text}
@@ -182,46 +193,6 @@ export default function Layout({ children }) {
                     </ListItem>
                 ))}
             </List>
-
-            {isAdmin && (
-                <>
-                    <Divider
-                        sx={{
-                            bgcolor: 'rgba(255,255,255,0.1)',
-                        }}
-                    />
-
-                    <List>
-                        {adminMenuItems.map((item) => (
-                            <ListItem
-                                button
-                                key={item.text}
-                                onClick={() => navigate(item.path)}
-                                sx={{
-                                    color: '#fff',
-                                    mx: 1,
-                                    borderRadius: 2,
-                                    width: 'calc(100% - 16px)',
-                                    '&:hover': {
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                    },
-                                }}
-                            >
-                                <ListItemIcon
-                                    sx={{
-                                        color: '#fff',
-                                        minWidth: 42,
-                                    }}
-                                >
-                                    {item.icon}
-                                </ListItemIcon>
-
-                                <ListItemText primary={item.text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                </>
-            )}
 
             <Box
                 sx={{
