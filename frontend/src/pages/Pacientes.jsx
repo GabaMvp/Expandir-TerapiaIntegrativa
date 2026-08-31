@@ -23,12 +23,16 @@ import {
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function Pacientes() {
+    const { isAdmin } = useAuth();
+
     const [pacientes, setPacientes] = useState([]);
     const [search, setSearch] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
     const [editando, setEditando] = useState(null);
+
     const [formData, setFormData] = useState({
         nome_completo: '',
         telefone: '',
@@ -55,14 +59,18 @@ export default function Pacientes() {
     }, []);
 
     const handleOpenDialog = (paciente = null) => {
+        if (!isAdmin) return;
+
         if (paciente) {
             setEditando(paciente);
+
             setFormData({
                 ...paciente,
                 data_nascimento: paciente.data_nascimento || '',
             });
         } else {
             setEditando(null);
+
             setFormData({
                 nome_completo: '',
                 telefone: '',
@@ -75,6 +83,7 @@ export default function Pacientes() {
                 convenio: '',
             });
         }
+
         setOpenDialog(true);
     };
 
@@ -84,12 +93,15 @@ export default function Pacientes() {
     };
 
     const handleSubmit = async () => {
+        if (!isAdmin) return;
+
         try {
             if (editando) {
                 await api.put(`/pacientes/${editando.id}`, formData);
             } else {
                 await api.post('/pacientes', formData);
             }
+
             handleCloseDialog();
             carregarPacientes();
         } catch (error) {
@@ -99,9 +111,12 @@ export default function Pacientes() {
     };
 
     const handleDelete = async (id) => {
+        if (!isAdmin) return;
+
         if (window.confirm('Tem certeza que deseja excluir este paciente?')) {
             try {
                 await api.delete(`/pacientes/${id}`);
+
                 alert('Paciente excluído com sucesso!');
                 carregarPacientes();
             } catch (error) {
@@ -111,67 +126,153 @@ export default function Pacientes() {
         }
     };
 
-    const filtered = pacientes.filter(p =>
+    const filtered = pacientes.filter((p) =>
         p.nome_completo?.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
         <Layout>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 3,
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontWeight: 'bold',
+                    }}
+                >
                     Pacientes
                 </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => handleOpenDialog()}
-                    sx={{ bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#2a2a4e' } }}
-                >
-                    Novo Paciente
-                </Button>
+
+                {isAdmin && (
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => handleOpenDialog()}
+                        sx={{
+                            bgcolor: '#1a1a2e',
+                            '&:hover': {
+                                bgcolor: '#2a2a4e',
+                            },
+                        }}
+                    >
+                        Novo Paciente
+                    </Button>
+                )}
             </Box>
 
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', mb: 3 }}>
+            <Card
+                sx={{
+                    borderRadius: 3,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    mb: 3,
+                }}
+            >
                 <CardContent>
                     <TextField
                         fullWidth
                         placeholder="Buscar paciente..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} /> }}
+                        InputProps={{
+                            startAdornment: (
+                                <Search
+                                    sx={{
+                                        mr: 1,
+                                        color: 'text.secondary',
+                                    }}
+                                />
+                            ),
+                        }}
                     />
                 </CardContent>
             </Card>
 
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+            <Card
+                sx={{
+                    borderRadius: 3,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                }}
+            >
+                <TableContainer
+                    component={Paper}
+                    sx={{
+                        boxShadow: 'none',
+                    }}
+                >
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell><strong>Nome</strong></TableCell>
-                                <TableCell><strong>Telefone</strong></TableCell>
-                                <TableCell><strong>Email</strong></TableCell>
-                                <TableCell><strong>Status</strong></TableCell>
-                                <TableCell align="right"><strong>Ações</strong></TableCell>
+                                <TableCell>
+                                    <strong>Nome</strong>
+                                </TableCell>
+
+                                <TableCell>
+                                    <strong>Telefone</strong>
+                                </TableCell>
+
+                                <TableCell>
+                                    <strong>Email</strong>
+                                </TableCell>
+
+                                <TableCell>
+                                    <strong>Status</strong>
+                                </TableCell>
+
+                                {isAdmin && (
+                                    <TableCell align="right">
+                                        <strong>Ações</strong>
+                                    </TableCell>
+                                )}
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
                             {filtered.map((p) => (
                                 <TableRow key={p.id}>
-                                    <TableCell>{p.nome_completo}</TableCell>
-                                    <TableCell>{p.telefone || '-'}</TableCell>
-                                    <TableCell>{p.email || '-'}</TableCell>
                                     <TableCell>
-                                        <Chip label="Ativo" size="small" color="success" />
+                                        {p.nome_completo}
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton onClick={() => handleOpenDialog(p)} size="small">
-                                            <Edit fontSize="small" />
-                                        </IconButton>
-                                        <IconButton onClick={() => handleDelete(p.id)} size="small" color="error">
-                                            <Delete fontSize="small" />
-                                        </IconButton>
+
+                                    <TableCell>
+                                        {p.telefone || '-'}
                                     </TableCell>
+
+                                    <TableCell>
+                                        {p.email || '-'}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Chip
+                                            label="Ativo"
+                                            size="small"
+                                            color="success"
+                                        />
+                                    </TableCell>
+
+                                    {isAdmin && (
+                                        <TableCell align="right">
+                                            <IconButton
+                                                onClick={() => handleOpenDialog(p)}
+                                                size="small"
+                                            >
+                                                <Edit fontSize="small" />
+                                            </IconButton>
+
+                                            <IconButton
+                                                onClick={() => handleDelete(p.id)}
+                                                size="small"
+                                                color="error"
+                                            >
+                                                <Delete fontSize="small" />
+                                            </IconButton>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -179,51 +280,94 @@ export default function Pacientes() {
                 </TableContainer>
             </Card>
 
-            <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                <DialogTitle>
-                    {editando ? 'Editar Paciente' : 'Novo Paciente'}
-                </DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="Nome completo"
-                        value={formData.nome_completo}
-                        onChange={(e) => setFormData({ ...formData, nome_completo: e.target.value })}
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Telefone"
-                        value={formData.telefone}
-                        onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                        margin="normal"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        margin="normal"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Data de nascimento"
-                        type="date"
-                        value={formData.data_nascimento}
-                        onChange={(e) => setFormData({ ...formData, data_nascimento: e.target.value })}
-                        margin="normal"
-                        InputLabelProps={{ shrink: true }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Cancelar</Button>
-                    <Button onClick={handleSubmit} variant="contained" sx={{ bgcolor: '#1a1a2e' }}>
-                        Salvar
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {isAdmin && (
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogTitle>
+                        {editando ? 'Editar Paciente' : 'Novo Paciente'}
+                    </DialogTitle>
+
+                    <DialogContent>
+                        <TextField
+                            fullWidth
+                            label="Nome completo"
+                            value={formData.nome_completo}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    nome_completo: e.target.value,
+                                })
+                            }
+                            margin="normal"
+                            required
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Telefone"
+                            value={formData.telefone}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    telefone: e.target.value,
+                                })
+                            }
+                            margin="normal"
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    email: e.target.value,
+                                })
+                            }
+                            margin="normal"
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Data de nascimento"
+                            type="date"
+                            value={formData.data_nascimento}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    data_nascimento: e.target.value,
+                                })
+                            }
+                            margin="normal"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </DialogContent>
+
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>
+                            Cancelar
+                        </Button>
+
+                        <Button
+                            onClick={handleSubmit}
+                            variant="contained"
+                            sx={{
+                                bgcolor: '#1a1a2e',
+                            }}
+                        >
+                            Salvar
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </Layout>
     );
 }
