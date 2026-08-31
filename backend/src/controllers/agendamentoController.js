@@ -8,10 +8,18 @@ exports.listar = async (req, res) => {
 
         let query = `
             SELECT 
-                a.id, a.data, a.horario, a.duracao, a.tipo_consulta, 
-                a.status, a.compareceu, a.observacoes,
-                p.nome_completo as paciente_nome,
-                psi.nome_completo as psicologo_nome
+                a.id,
+                a.psicologo_id,
+                a.paciente_id,
+                a.data,
+                a.horario,
+                a.duracao,
+                a.tipo_consulta,
+                a.status,
+                a.compareceu,
+                a.observacoes,
+                p.nome_completo AS paciente_nome,
+                psi.nome_completo AS psicologo_nome
         `;
 
         if (role === 'admin') {
@@ -53,6 +61,7 @@ exports.listar = async (req, res) => {
         res.json(result.rows);
     } catch (error) {
         console.error('Erro ao listar agendamentos:', error);
+
         res.status(500).json({
             error: 'Erro ao listar agendamentos.',
         });
@@ -99,7 +108,10 @@ exports.criar = async (req, res) => {
                 AND role != $2
                 AND ativo = true
             `,
-            [psicologo_id_agendamento, 'admin']
+            [
+                psicologo_id_agendamento,
+                'admin',
+            ]
         );
 
         if (checkPsicologo.rows.length === 0) {
@@ -211,6 +223,156 @@ exports.criar = async (req, res) => {
     }
 };
 
+exports.atualizar = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const role = req.psicologoRole;
+
+        if (role !== 'admin') {
+            return res.status(403).json({
+                error: 'Apenas administradores podem editar agendamentos.',
+            });
+        }
+
+        const {
+            paciente_id,
+            psicologo_id_agendamento,
+            data,
+            horario,
+            duracao,
+            tipo_consulta,
+            valor_consulta,
+            observacoes,
+        } = req.body;
+
+        if (
+            !paciente_id ||
+            !psicologo_id_agendamento ||
+            !data ||
+            !horario
+        ) {
+            return res.status(400).json({
+                error: 'Paciente, psicólogo, data e horário são obrigatórios.',
+            });
+        }
+
+        const checkPsicologo = await pool.query(
+            `
+                SELECT id
+                FROM psicologos
+                WHERE id = $1
+                AND role != 'admin'
+                AND ativo = true
+            `,
+            [psicologo_id_agendamento]
+        );
+
+        if (checkPsicologo.rows.length === 0) {
+            return res.status(400).json({
+                error: 'Psicólogo inválido ou inativo.',
+            });
+        }
+
+        const checkPaciente = await pool.query(
+            `
+                SELECT id
+                FROM pacientes
+                WHERE id = $1
+            `,
+            [paciente_id]
+        );
+
+        if (checkPaciente.rows.length === 0) {
+            return res.status(400).json({
+                error: 'Paciente inválido.',
+            });
+        }
+
+        const conflito = await pool.query(
+            `
+                SELECT id
+                FROM agendamentos
+                WHERE psicologo_id = $1
+                AND data = $2
+                AND horario = $3
+                AND id != $4
+                AND status != 'cancelado'
+            `,
+            [
+                psicologo_id_agendamento,
+                data,
+                horario,
+                id,
+            ]
+        );
+
+        if (conflito.rows.length > 0) {
+            return res.status(409).json({
+                error: 'Já existe agendamento neste horário para este psicólogo.',
+            });
+        }
+
+        const valor = parseFloat(valor_consulta) || 0;
+
+        const result = await pool.query(
+            `
+                UPDATE agendamentos
+                SET
+                    paciente_id = $1,
+                    psicologo_id = $2,
+                    data = $3,
+                    horario = $4,
+                    duracao = $5,
+                    tipo_consulta = $6,
+                    valor_consulta = $7,
+                    observacoes = $8
+                WHERE id = $9
+                RETURNING *
+            `,
+            [
+                paciente_id,
+                psicologo_id_agendamento,
+                data,
+                horario,
+                duracao || 50,
+                tipo_consulta || 'presencial',
+                valor,
+                observacoes,
+                id,
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Agendamento não encontrado.',
+            });
+        }
+
+        await pool.query(
+            `
+                UPDATE pacientes
+                SET psicologo_id = $1
+                WHERE id = $2
+            `,
+            [
+                psicologo_id_agendamento,
+                paciente_id,
+            ]
+        );
+
+        res.json({
+            message: 'Agendamento atualizado com sucesso!',
+            agendamento: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar agendamento:', error);
+
+        res.status(500).json({
+            error: 'Erro ao atualizar agendamento.',
+        });
+    }
+};
+
 exports.cancelar = async (req, res) => {
     try {
         const { id } = req.params;
@@ -301,6 +463,12 @@ exports.marcarComparecimento = async (req, res) => {
         const psicologo_id = req.psicologoId;
         const role = req.psicologoRole;
         const { compareceu } = req.body;
+
+        if (typeof compareceu !== 'boolean') {
+            return res.status(400).json({
+                error: 'O campo compareceu deve ser verdadeiro ou falso.',
+            });
+        }
 
         let query = `
             UPDATE agendamentos
