@@ -182,7 +182,7 @@ exports.criar = async (req, res) => {
                     $6,
                     $7,
                     $8,
-                    'agendado'
+                    'confirmado'
                 )
                 RETURNING *
             `,
@@ -425,6 +425,60 @@ exports.atualizarStatus = async (req, res) => {
             });
         }
 
+        if (!['confirmado', 'cancelado'].includes(status)) {
+            return res.status(400).json({
+                error: 'Status inválido.',
+            });
+        }
+
+        const agendamentoAtual = await pool.query(
+            `
+                SELECT
+                    id,
+                    psicologo_id,
+                    data,
+                    horario,
+                    status
+                FROM agendamentos
+                WHERE id = $1
+            `,
+            [id]
+        );
+
+        if (agendamentoAtual.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Agendamento não encontrado.',
+            });
+        }
+
+        const agendamento = agendamentoAtual.rows[0];
+
+        if (status === 'confirmado') {
+            const conflito = await pool.query(
+                `
+                    SELECT id
+                    FROM agendamentos
+                    WHERE psicologo_id = $1
+                    AND data = $2
+                    AND horario = $3
+                    AND id != $4
+                    AND status != 'cancelado'
+                `,
+                [
+                    agendamento.psicologo_id,
+                    agendamento.data,
+                    agendamento.horario,
+                    id,
+                ]
+            );
+
+            if (conflito.rows.length > 0) {
+                return res.status(409).json({
+                    error: 'Não é possível confirmar este atendimento porque o horário já está ocupado.',
+                });
+            }
+        }
+
         const result = await pool.query(
             `
                 UPDATE agendamentos
@@ -432,20 +486,14 @@ exports.atualizarStatus = async (req, res) => {
                 WHERE id = $2
                 RETURNING *
             `,
-            [
-                status,
-                id,
-            ]
+            [status, id]
         );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                error: 'Agendamento não encontrado.',
-            });
-        }
-
         res.json({
-            message: 'Status atualizado!',
+            message:
+                status === 'confirmado'
+                    ? 'Atendimento confirmado com sucesso!'
+                    : 'Atendimento cancelado com sucesso!',
             agendamento: result.rows[0],
         });
     } catch (error) {

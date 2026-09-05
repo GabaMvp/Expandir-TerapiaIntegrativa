@@ -52,6 +52,7 @@ export default function TodosAgendamentos() {
     const [formData, setFormData] = useState({
         paciente_id: '',
         psicologo_id_agendamento: '',
+        status: 'confirmado',
         data: '',
         horario: '',
         duracao: 50,
@@ -124,6 +125,7 @@ export default function TodosAgendamentos() {
         setFormData({
             paciente_id: agendamento.paciente_id || '',
             psicologo_id_agendamento: agendamento.psicologo_id || '',
+            status: agendamento.status || 'confirmado',
             data: prepararDataInput(agendamento.data),
             horario: prepararHorarioInput(agendamento.horario),
             duracao: agendamento.duracao || 50,
@@ -181,21 +183,45 @@ export default function TodosAgendamentos() {
             return;
         }
 
+        if (!formData.status) {
+            setErro('Selecione um status.');
+            return;
+        }
+
         try {
             setLoading(true);
 
             const dados = {
-                ...formData,
+                paciente_id: formData.paciente_id,
+                psicologo_id_agendamento:
+                    formData.psicologo_id_agendamento,
+                data: formData.data,
+                horario: formData.horario,
                 duracao: Number(formData.duracao) || 50,
+                tipo_consulta:
+                    formData.tipo_consulta || 'presencial',
                 valor_consulta: formData.valor_consulta
                     ? parseFloat(formData.valor_consulta)
                     : 0,
+                observacoes: formData.observacoes,
             };
 
             await api.put(
                 `/agendamentos/${agendamentoSelecionado.id}`,
                 dados
             );
+
+            if (
+                formData.status !==
+                agendamentoSelecionado.status
+            ) {
+                await api.put(
+                    `/agendamentos/${agendamentoSelecionado.id}/status`,
+                    {
+                        status: formData.status,
+                    }
+                );
+            }
 
             setSucesso('Agendamento atualizado com sucesso!');
 
@@ -211,14 +237,17 @@ export default function TodosAgendamentos() {
 
             setErro(
                 error?.response?.data?.error ||
-                'Erro ao editar agendamento.'
+                    'Erro ao editar agendamento.'
             );
         } finally {
             setLoading(false);
         }
     };
 
-    const marcarComparecimento = async (agendamento, compareceu) => {
+    const marcarComparecimento = async (
+        agendamento,
+        compareceu
+    ) => {
         try {
             await api.put(
                 `/agendamentos/${agendamento.id}/compareceu`,
@@ -236,25 +265,33 @@ export default function TodosAgendamentos() {
 
             alert(
                 error?.response?.data?.error ||
-                'Erro ao registrar comparecimento.'
+                    'Erro ao registrar comparecimento.'
             );
         }
     };
 
     const renderStatus = (status) => {
         let color = 'default';
+        let label = status || 'Confirmado';
 
         if (status === 'confirmado') {
             color = 'success';
+            label = 'Confirmado';
         }
 
         if (status === 'cancelado') {
             color = 'error';
+            label = 'Cancelado';
+        }
+
+        if (status === 'agendado') {
+            color = 'success';
+            label = 'Confirmado';
         }
 
         return (
             <Chip
-                label={status || 'agendado'}
+                label={label}
                 size="small"
                 color={color}
             />
@@ -305,14 +342,16 @@ export default function TodosAgendamentos() {
                     variant="body2"
                     sx={{ color: 'text.secondary' }}
                 >
-                    Visualize, edite e registre a presença dos agendamentos.
+                    Visualize, edite e registre a presença dos
+                    agendamentos.
                 </Typography>
             </Box>
 
             <Card
                 sx={{
                     borderRadius: 3,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    boxShadow:
+                        '0 2px 8px rgba(0,0,0,0.05)',
                 }}
             >
                 <CardContent>
@@ -370,7 +409,10 @@ export default function TodosAgendamentos() {
 
                                         <TableCell>
                                             {a.horario
-                                                ? a.horario.slice(0, 5)
+                                                ? a.horario.slice(
+                                                      0,
+                                                      5
+                                                  )
                                                 : '-'}
                                         </TableCell>
 
@@ -383,17 +425,22 @@ export default function TodosAgendamentos() {
                                         </TableCell>
 
                                         <TableCell>
-                                            {a.tipo_consulta || '-'}
+                                            {a.tipo_consulta ||
+                                                '-'}
                                         </TableCell>
 
                                         <TableCell>
-                                            R$ {Number(
-                                                a.valor_consulta || 0
+                                            R${' '}
+                                            {Number(
+                                                a.valor_consulta ||
+                                                    0
                                             ).toFixed(2)}
                                         </TableCell>
 
                                         <TableCell>
-                                            {renderStatus(a.status)}
+                                            {renderStatus(
+                                                a.status
+                                            )}
                                         </TableCell>
 
                                         <TableCell>
@@ -403,16 +450,20 @@ export default function TodosAgendamentos() {
                                         <TableCell align="center">
                                             <Box
                                                 sx={{
-                                                    display: 'flex',
+                                                    display:
+                                                        'flex',
                                                     gap: 0.5,
-                                                    justifyContent: 'center',
+                                                    justifyContent:
+                                                        'center',
                                                 }}
                                             >
                                                 <Tooltip title="Editar agendamento">
                                                     <IconButton
                                                         size="small"
                                                         onClick={() =>
-                                                            handleEditar(a)
+                                                            handleEditar(
+                                                                a
+                                                            )
                                                         }
                                                         sx={{
                                                             color: '#7B944A',
@@ -422,7 +473,8 @@ export default function TodosAgendamentos() {
                                                     </IconButton>
                                                 </Tooltip>
 
-                                                {a.status !== 'cancelado' && (
+                                                {a.status !==
+                                                    'cancelado' && (
                                                     <>
                                                         <Tooltip title="Marcar como compareceu">
                                                             <IconButton
@@ -466,7 +518,8 @@ export default function TodosAgendamentos() {
                                             colSpan={9}
                                             align="center"
                                         >
-                                            Nenhum agendamento encontrado.
+                                            Nenhum agendamento
+                                            encontrado.
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -507,7 +560,38 @@ export default function TodosAgendamentos() {
                         )}
 
                         <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel>
+                                        Status
+                                    </InputLabel>
+
+                                    <Select
+                                        name="status"
+                                        value={
+                                            formData.status
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                        label="Status"
+                                    >
+                                        <MenuItem value="confirmado">
+                                            Confirmado
+                                        </MenuItem>
+
+                                        <MenuItem value="cancelado">
+                                            Cancelado
+                                        </MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <FormControl
                                     fullWidth
                                     required
@@ -521,25 +605,39 @@ export default function TodosAgendamentos() {
                                         value={
                                             formData.psicologo_id_agendamento
                                         }
-                                        onChange={handleChange}
+                                        onChange={
+                                            handleChange
+                                        }
                                         label="Psicólogo"
                                     >
-                                        {psicologos.map((p) => (
-                                            <MenuItem
-                                                key={p.id}
-                                                value={p.id}
-                                            >
-                                                {p.nome_completo}
-                                                {p.crp
-                                                    ? ` - ${p.crp}`
-                                                    : ''}
-                                            </MenuItem>
-                                        ))}
+                                        {psicologos.map(
+                                            (p) => (
+                                                <MenuItem
+                                                    key={
+                                                        p.id
+                                                    }
+                                                    value={
+                                                        p.id
+                                                    }
+                                                >
+                                                    {
+                                                        p.nome_completo
+                                                    }
+                                                    {p.crp
+                                                        ? ` - ${p.crp}`
+                                                        : ''}
+                                                </MenuItem>
+                                            )
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <FormControl
                                     fullWidth
                                     required
@@ -550,53 +648,85 @@ export default function TodosAgendamentos() {
 
                                     <Select
                                         name="paciente_id"
-                                        value={formData.paciente_id}
-                                        onChange={handleChange}
+                                        value={
+                                            formData.paciente_id
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         label="Paciente"
                                     >
-                                        {pacientes.map((p) => (
-                                            <MenuItem
-                                                key={p.id}
-                                                value={p.id}
-                                            >
-                                                {p.nome_completo}
-                                            </MenuItem>
-                                        ))}
+                                        {pacientes.map(
+                                            (p) => (
+                                                <MenuItem
+                                                    key={
+                                                        p.id
+                                                    }
+                                                    value={
+                                                        p.id
+                                                    }
+                                                >
+                                                    {
+                                                        p.nome_completo
+                                                    }
+                                                </MenuItem>
+                                            )
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <TextField
                                     fullWidth
                                     required
                                     label="Data da Consulta"
                                     name="data"
                                     type="date"
-                                    value={formData.data}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.data
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
                                 />
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <TextField
                                     fullWidth
                                     required
                                     label="Horário"
                                     name="horario"
                                     type="time"
-                                    value={formData.horario}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.horario
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
                                 />
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <FormControl fullWidth>
                                     <InputLabel>
                                         Tipo de Consulta
@@ -604,8 +734,12 @@ export default function TodosAgendamentos() {
 
                                     <Select
                                         name="tipo_consulta"
-                                        value={formData.tipo_consulta}
-                                        onChange={handleChange}
+                                        value={
+                                            formData.tipo_consulta
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         label="Tipo de Consulta"
                                     >
                                         <MenuItem value="presencial">
@@ -619,14 +753,22 @@ export default function TodosAgendamentos() {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <TextField
                                     fullWidth
                                     label="Duração (minutos)"
                                     name="duracao"
                                     type="number"
-                                    value={formData.duracao}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.duracao
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     InputProps={{
                                         inputProps: {
                                             min: 15,
@@ -636,14 +778,22 @@ export default function TodosAgendamentos() {
                                 />
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                            >
                                 <TextField
                                     fullWidth
                                     label="Valor da Consulta (R$)"
                                     name="valor_consulta"
                                     type="number"
-                                    value={formData.valor_consulta}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.valor_consulta
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     inputProps={{
                                         min: 0,
                                         step: '0.01',
@@ -658,8 +808,12 @@ export default function TodosAgendamentos() {
                                     name="observacoes"
                                     multiline
                                     rows={3}
-                                    value={formData.observacoes}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.observacoes
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                 />
                             </Grid>
                         </Grid>
@@ -668,7 +822,9 @@ export default function TodosAgendamentos() {
 
                 <DialogActions sx={{ p: 3 }}>
                     <Button
-                        onClick={handleFecharEditar}
+                        onClick={
+                            handleFecharEditar
+                        }
                         disabled={loading}
                     >
                         Cancelar
@@ -676,12 +832,15 @@ export default function TodosAgendamentos() {
 
                     <Button
                         variant="contained"
-                        onClick={handleSalvarEdicao}
+                        onClick={
+                            handleSalvarEdicao
+                        }
                         disabled={loading}
                         sx={{
                             bgcolor: '#7B944A',
                             '&:hover': {
-                                bgcolor: '#687F3E',
+                                bgcolor:
+                                    '#687F3E',
                             },
                         }}
                     >
